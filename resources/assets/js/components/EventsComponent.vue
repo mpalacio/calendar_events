@@ -32,7 +32,7 @@
             <template v-for="(days, month) in this.events">
                 <h2>{{ month }}</h2>
                 <div class="col-sm-12 border-top" v-for="day in days">
-                    <div class="bg-success fade" style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; " v-if="day.event != ''"></div>
+                    <div :class="'bg-success fade' + (day.event != '' ? ' updated' : '')" style="position: absolute; width: 100%; height: 100%; left: 0; top: 0;"></div>
                     <div class="row">
                         <div class="col-sm-3">{{ day.day }}</div>
                         <div class="col-sm-9">{{ day.event }}</div>
@@ -112,10 +112,12 @@
                 axios.post(base_url + '/events', params).then((response) => {
                     this.events = response.data.events;
 
-                    $('.fade').addClass('show');
                     setTimeout(function () {
-                        $('.fade.show').removeClass('show');
-                    }, 500);
+                        $('.fade.updated').addClass('show');
+                        setTimeout(function () {
+                            $('.fade.updated').removeClass('show');
+                        }, 1000);
+                    }, 0);
 
                     toastr.success('Event successfully saved.');
                 }).catch((error) => console.log(error.response));
