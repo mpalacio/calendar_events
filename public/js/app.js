@@ -37019,6 +37019,7 @@ Vue.use(__webpack_require__(275));
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.component('form-datepicker', __webpack_require__(344));
 Vue.component('events', __webpack_require__(335));
 
 var app = new Vue({
@@ -83144,22 +83145,125 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
             base_url: '',
-            date_from: Vue.moment().startOf('year').format('MM-DD-YYYY'),
-            date_to: Vue.moment().endOf('year').format('MM-DD-YYYY'),
+            event_name: '',
+            date_from: Vue.moment().startOf('month').format('YYYY-MM-DD'),
+            date_to: Vue.moment().endOf('month').format('YYYY-MM-DD'),
+            checked_days: [],
+            days: [{
+                value: 1,
+                day: 'Mon'
+            }, {
+                value: 2,
+                day: 'Tue'
+            }, {
+                value: 3,
+                day: 'Wed'
+            }, {
+                value: 4,
+                day: 'Thur'
+            }, {
+                value: 5,
+                day: 'Fri'
+            }, {
+                value: 6,
+                day: 'Sat'
+            }, {
+                value: 0,
+                day: 'Sun'
+            }],
             events: []
         };
     },
     created: function created() {
         this.base_url = window.base_url;
+
+        this.fetchEvents();
     },
 
 
-    methods: {}
+    methods: {
+        fetchEvents: function fetchEvents() {
+            var _this = this;
+
+            var params = {
+                date_from: this.date_from,
+                date_to: this.date_to
+            };
+            axios.get(base_url + '/events', { params: params }).then(function (response) {
+                _this.events = response.data.events;
+            }).catch(function (error) {
+                return console.log(error.response);
+            });
+        },
+        saveEvents: function saveEvents() {
+            var _this2 = this;
+
+            var params = {
+                name: this.event_name,
+                date_from: this.date_from,
+                date_to: this.date_to,
+                days: this.checked_days
+            };
+            axios.post(base_url + '/events', params).then(function (response) {
+                _this2.events = response.data.events;
+
+                $('.fade').addClass('show');
+                setTimeout(function () {
+                    $('.fade.show').removeClass('show');
+                }, 500);
+
+                toastr.success('Event successfully saved.');
+            }).catch(function (error) {
+                return console.log(error.response);
+            });
+
+            return false;
+        },
+        toggleDay: function toggleDay(day) {
+            var index = this.checked_days.indexOf(day);
+            if (index >= 0) {
+                this.checked_days.splice(index, 1);
+            } else {
+                this.checked_days.push(day);
+            }
+        }
+    }
 });
 
 /***/ }),
@@ -83170,19 +83274,189 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "row" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-md-6" }, [
+      _c("div", { staticClass: "form-group" }, [
+        _c("label", [_vm._v("Event")]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.event_name,
+              expression: "event_name"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { type: "text" },
+          domProps: { value: _vm.event_name },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.event_name = $event.target.value
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c(
+          "div",
+          { staticClass: "form-group col-md-6" },
+          [
+            _c("label", [_vm._v("From")]),
+            _vm._v(" "),
+            _c("form-datepicker", {
+              attrs: { "element-class": "form-control" },
+              on: {
+                change: function($event) {
+                  return _vm.fetchEvents()
+                }
+              },
+              model: {
+                value: _vm.date_from,
+                callback: function($$v) {
+                  _vm.date_from = $$v
+                },
+                expression: "date_from"
+              }
+            })
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "form-group col-md-6" },
+          [
+            _c("label", [_vm._v("To")]),
+            _vm._v(" "),
+            _c("form-datepicker", {
+              attrs: { "element-class": "form-control" },
+              on: {
+                change: function($event) {
+                  return _vm.fetchEvents()
+                }
+              },
+              model: {
+                value: _vm.date_to,
+                callback: function($$v) {
+                  _vm.date_to = $$v
+                },
+                expression: "date_to"
+              }
+            })
+          ],
+          1
+        )
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "form-group" },
+        [
+          _vm._l(_vm.days, function(day) {
+            return [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "custom-control custom-control-inline custom-checkbox"
+                },
+                [
+                  _c("input", {
+                    staticClass: "custom-control-input",
+                    attrs: { type: "checkbox", id: "day-" + day.value },
+                    on: {
+                      click: function($event) {
+                        return _vm.toggleDay(day.value)
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticClass: "custom-control-label",
+                      attrs: { for: "day-" + day.value }
+                    },
+                    [_vm._v(_vm._s(day.day))]
+                  )
+                ]
+              )
+            ]
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          on: {
+            click: function($event) {
+              return _vm.saveEvents()
+            }
+          }
+        },
+        [_vm._v("Save")]
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "col-md-6" },
+      [
+        _vm._l(this.events, function(days, month) {
+          return [
+            _c("h2", [_vm._v(_vm._s(month))]),
+            _vm._v(" "),
+            _vm._l(days, function(day) {
+              return _c("div", { staticClass: "col-sm-12 border-top" }, [
+                day.event != ""
+                  ? _c("div", {
+                      staticClass: "bg-success fade",
+                      staticStyle: {
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        left: "0",
+                        top: "0"
+                      }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-sm-3" }, [
+                    _vm._v(_vm._s(day.day))
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-sm-9" }, [
+                    _vm._v(_vm._s(day.event))
+                  ])
+                ])
+              ])
+            })
+          ]
+        })
+      ],
+      2
+    )
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-12" }, [_c("h1", [_vm._v("Calendar")])]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-3" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-9" })
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("h1", [_vm._v("Calendar")])
     ])
   }
 ]
@@ -83200,6 +83474,178 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(336)
+/* script */
+var __vue_script__ = __webpack_require__(345)
+/* template */
+var __vue_template__ = __webpack_require__(346)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/_custom/form-datepicker.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1003ce1f", Component.options)
+  } else {
+    hotAPI.reload("data-v-1003ce1f", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 345 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        elementClass: String,
+        value: String,
+        dataDateFormat: {
+            default: 'yy-mm-dd',
+            type: String
+        },
+        dataMomentFormat: {
+            default: 'YYYY-MM-DD',
+            type: String
+        },
+        min: {
+            default: null,
+            type: String
+        },
+        max: {
+            default: null,
+            type: String
+        },
+        dataField: String
+    },
+    directives: {
+        datepicker: {
+            inserted: function inserted(el, binding, vNode) {
+                var interval = setInterval(function (el, binding, vNode) {
+                    if (typeof $().datepicker === 'function' && $(el).is(':visible')) {
+                        $(el).datepicker({
+                            autoclose: true,
+                            minDate: $(el).data('min-date'),
+                            maxDate: $(el).data('max-date'),
+                            dateFormat: $(el).data('format'),
+                            onSelect: function onSelect(dateText) {
+                                vNode.context.$emit('input', dateText);
+                                vNode.context.$emit('change');
+                            },
+                            onClose: function onClose(dateText) {
+                                var moment_format = $(el).data('moment-format');
+
+                                if (dateText != '') {
+                                    var date = Vue.moment(dateText, moment_format);
+                                    if (!date.isValid()) {
+                                        date = Vue.moment();
+
+                                        vNode.context.$emit('input', date.format(moment_format));
+                                        vNode.context.$emit('change');
+
+                                        $(el).val(date.format(moment_format));
+
+                                        var d = new Date(date.get('year'), date.get('month'), date.get('date'));
+                                        $(el).datepicker('setDate', d);
+                                    } else {
+                                        vNode.context.$emit('input', date.format(moment_format));
+
+                                        $(el).val(date.format(moment_format));
+                                    }
+                                } else {
+                                    date = Vue.moment();
+
+                                    vNode.context.$emit('input', date.format(moment_format));
+                                    vNode.context.$emit('change');
+
+                                    $(el).val(date.format(moment_format));
+
+                                    var d = new Date(date.get('year'), date.get('month'), date.get('date'));
+                                    $(el).datepicker('setDate', d);
+                                }
+                            }
+                        });
+
+                        clearInterval(interval);
+                    }
+                }, 1000, el, binding, vNode);
+            }
+        }
+    }
+});
+
+/***/ }),
+/* 346 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("input", {
+    directives: [{ name: "datepicker", rawName: "v-datepicker" }],
+    class: _vm.elementClass,
+    attrs: {
+      type: "text",
+      "data-field": _vm.dataField,
+      "data-format": _vm.dataDateFormat,
+      "data-moment-format": _vm.dataMomentFormat,
+      "data-min-date": _vm.min,
+      "data-max-date": _vm.max
+    },
+    domProps: { value: _vm.value }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-1003ce1f", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

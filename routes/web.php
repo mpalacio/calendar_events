@@ -11,14 +11,9 @@
 |
 */
 
-Route::get('/', 'EventsController@index');
+Route::get('/', function () {
+    return view('index');
+});
 
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
-
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
-
+Route::get('events', 'EventsController@index');
+Route::post('events', 'EventsController@update');
